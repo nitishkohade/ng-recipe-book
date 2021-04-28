@@ -1,0 +1,62 @@
+<nav class="navbar navbar-default">
+    <div class="container-fluid">
+        <div class="navbar-header">
+            <a href="#" class="navbar-brand">Recipe Book</a>
+        </div>
+
+        <pane id="1"></pane>
+        <pane id="2"></pane>
+        <pane id="3"></pane>
+
+        <div class="collapse navbar-collapse">
+            <ul class="nav navbar-nav">
+                <!-- <li (click)="onSelect('recipe')"><a href="#">Recipes</a></li>
+                <li (click)="onSelect('shopping-list')"><a href="#">Shopping List</a></li> -->
+                <li [routerLinkActive]="'active'"
+                    [routerLinkActiveOptions]="{exact: true}">
+                    <a routerLink="/recipes" *ngIf="isAuthenticated">
+                        Recipes
+                    </a>
+                </li>
+                <li routerLinkActive="active">
+                    <a [routerLink]="['/auth']" *ngIf="!isAuthenticated">
+                        Authenticate
+                    </a>
+                </li>
+                <!-- <li><a [queryParams]="{allowEdit: '1'}" fragment="loading" [routerLink]="'shopping-list'">Shopping List</a></li> -->
+                <!-- <li routerLinkActive="active"><a [routerLink]="['/shopping-list', 10]">Shopping List</a></li> -->
+                <li routerLinkActive="active">
+                    <a [routerLink]="['/shopping-list']" >
+                        Shopping List
+                    </a>
+                </li>
+            </ul>
+            <ul class="nav navbar-nav navbar-right">
+                <li>
+                    <a style="cursor: pointer;" *ngIf="isAuthenticated" (click)="onLogout()">
+                        Logout
+                    </a>
+                </li>
+                <li appDropdown class="dropdown" *ngIf="isAuthenticated">
+                    <a style="cursor: pointer;" class="dropdown-toggle" role="button">
+                        Manage <span class="caret"></span>
+                    </a>
+                    <ul class="dropdown-menu">
+                        <li><a style="cursor: pointer;" (click) = "onSaveData()">Save Data</a></li>
+                        <li><a style="cursor: pointer;" (click) = "onFetchData()">Fetch Data</a></li>
+                    </ul>
+                </li>
+                <!-- <div class="input-wrapper">
+                    <label class="page-size-input">
+                      Page size
+                      <select [(ngModel)]="getPageSize">
+                        <option value="20">20</option>
+                        <option value="25">25</option>
+                        <option value="50">50</option>
+                      </select>
+                    </label>
+                  </div> -->
+            </ul>
+        </div>
+    </div>
+</nav>
