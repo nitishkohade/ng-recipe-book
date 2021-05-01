@@ -1,10 +1,13 @@
 import { Component, EventEmitter, Input, OnDestroy, OnInit, Output, QueryList, ViewChildren } from '@angular/core';
 import { ActivatedRoute, Router } from '@angular/router';
+import { Store } from '@ngrx/store';
 import { Subscription } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { Pane } from '../directives/pane.directive';
 import { AuthService } from '../services/auth.service';
 import { DataStorageService } from '../services/data-storage.service';
 import { FirebaseAuthService } from '../services/firebaseAuth.service';
+import * as fromApp from '../store/app.reducer';
 
 @Component({
   selector: 'app-header',
@@ -48,7 +51,8 @@ export class HeaderComponent implements OnInit, OnDestroy{
     private route: ActivatedRoute, 
     private authService: AuthService,
     private dataStorageService: DataStorageService,
-    private firebaseAuth: FirebaseAuthService
+    private firebaseAuth: FirebaseAuthService,
+    private store: Store<fromApp.AppState>
     ){
       if(typeof this.vUnknown == 'string') {
         let s2: string = this.vUnknown
@@ -67,7 +71,12 @@ export class HeaderComponent implements OnInit, OnDestroy{
     // this.route.snapshot.fragment.subscribe();
     // this.paramsSubscription = this.route.params
     // .subscribe((params)=>{})
-    this.userSub = this.firebaseAuth.user.subscribe(
+    this.userSub = this.store.select('auth').pipe(
+      map(
+        (authState) => authState.user
+      )
+      )
+      .subscribe(
       user => {
         console.log("response called")
         this.isAuthenticated = !!user

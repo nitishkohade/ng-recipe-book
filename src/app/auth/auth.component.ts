@@ -1,10 +1,14 @@
 import { Component, ComponentFactoryResolver, ViewChild } from "@angular/core";
 import { NgForm } from "@angular/forms";
 import { Router } from "@angular/router";
+import { Store } from "@ngrx/store";
 import { Observable, Subscription } from "rxjs";
 import { AlertComponent } from "../common/alert/alert.component";
 import { PlaceholderDirective } from "../common/placeholder.directive";
 import { FirebaseAuthService, AuthResponseData } from '../services/firebaseAuth.service';
+import * as fromApp from "../store/app.reducer";
+import * as fromActions from "./store/auth.actions";
+
 
 @Component({
     selector: "app-auth",
@@ -23,10 +27,24 @@ export class AuthComponent {
 
     constructor(private auth: FirebaseAuthService, 
         private router: Router,
-        private componentFactoryResolver: ComponentFactoryResolver) {}
+        private componentFactoryResolver: ComponentFactoryResolver,
+        private store: Store<fromApp.AppState>) {}
 
     onSwitchMode() {
         this.isLoginMode = !this.isLoginMode
+    }
+
+    ngOnInit() {
+        this.store.select('auth').subscribe(
+            authState => {
+                console.log("success")
+                this.isLoading = authState.loading
+                this.error = authState.authError
+                if(this.error) {
+                    this.showErrorAlert(this.error)
+                }
+            }
+        )
     }
 
     OnSubmit(form: NgForm){
@@ -41,24 +59,28 @@ export class AuthComponent {
         const password = form.value.password
 
         if(this.isLoginMode) {
-            authObs = this.auth.login(email, password)
+            // authObs = this.auth.login(email, password)
+            this.store.dispatch(new fromActions.LoginStart({
+                email, password
+            }))
         } else {
             authObs = this.auth.signup(email, password)
         }
 
-        authObs.subscribe(
-            res => {
-                this.isLoading = false
-                this.error = null
-                this.router.navigate(['/recipes'])
-            },
-            errorMes => {                       
-                this.error = errorMes
-                this.showErrorAlert(errorMes)
-                this.isLoading = false
-            }
-        )
-         form.reset(); 
+        // authObs.subscribe(
+        //     res => {
+        //         this.isLoading = false
+        //         this.error = null
+        //         this.router.navigate(['/recipes'])
+        //     },
+        //     errorMes => {                       
+        //         this.error = errorMes
+        //         this.showErrorAlert(errorMes)
+        //         this.isLoading = false
+        //     }
+        // )
+
+        form.reset(); 
     }
 
     private showErrorAlert(errorMes: string) {

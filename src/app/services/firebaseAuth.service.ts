@@ -5,6 +5,9 @@ import { BehaviorSubject, throwError } from "rxjs";
 import { catchError, tap } from "rxjs/operators";
 import { User } from "../common/user.model";
 import { environment } from "../../environments/environment"
+import { Store } from "@ngrx/store";
+import * as fromApp from "../store/app.reducer";
+import * as fromAuth from "../auth/store/auth.actions";
 
 export interface AuthResponseData {
     idToken: string;
@@ -22,14 +25,17 @@ export interface AuthResponseData {
 })
 export class FirebaseAuthService {
 
-    user = new BehaviorSubject<User>(null)
+    // user = new BehaviorSubject<User>(null)
 
     tokenExpirationTimer: any;
 
-    constructor(private http: HttpClient, private router: Router) {}
+    constructor(private http: HttpClient, 
+        private router: Router,
+        private store: Store<fromApp.AppState>) {}
 
     logout() {
-        this.user.next(null)
+        // this.user.next(null)
+        this.store.dispatch(new fromAuth.Logout())
         this.router.navigate(["/auth"])
         localStorage.removeItem('userData')
         if(this.tokenExpirationTimer) {
@@ -58,7 +64,11 @@ export class FirebaseAuthService {
         }
         const user = new User(userData.email, userData.id, userData._token, userData._tokenExpirationDate)
         if(user.token) {
-           this.user.next(user) 
+            this.store.dispatch(new fromAuth.AuthenticateSuccess({email: user.email, 
+                userId: user.id, 
+                token: user.token, 
+                expirationDate: new Date(userData._tokenExpirationDate)}))
+        //    this.user.next(user) 
            this.autoLogout(new Date(userData._tokenExpirationDate).getTime() - new Date().getTime() )
         }
     }
@@ -76,7 +86,13 @@ export class FirebaseAuthService {
         const user = new User(email, localId, idToken, expirationDate)
         localStorage.setItem('userData', JSON.stringify(user))
         this.autoLogout(+expiresIn * 1000)
-        this.user.next(user)
+        // this.user.next(user)
+        if(user.token) {
+            this.store.dispatch(new fromAuth.AuthenticateSuccess({email: user.email, 
+                userId: user.id, 
+                token: user.token, 
+                expirationDate: expirationDate}))
+            }
     }
 
     private handleErrorResponse(errorRes: HttpErrorResponse) {

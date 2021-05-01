@@ -17,7 +17,9 @@ import { CoreModule } from './core.module';
 import { AuthModule } from './auth/auth.module';
 import { LoggingService } from './logging.service';
 import { StoreModule } from '@ngrx/store';
-import { shoppingListReducer } from './shopping-list/store/shopping-list.reducer';
+import * as fromApp from './store/app.reducer';
+import { EffectsModule } from '@ngrx/effects';
+import { AuthEffects } from './auth/store/auth.effect';
 
 
 @NgModule({
@@ -31,9 +33,8 @@ import { shoppingListReducer } from './shopping-list/store/shopping-list.reducer
     ImagePipe
   ],
   imports: [
-    StoreModule.forRoot({
-      shoppingList: shoppingListReducer
-    }),
+    StoreModule.forRoot(fromApp.appReducer),
+    EffectsModule.forRoot([AuthEffects]),
     BrowserModule,
     BrowserAnimationsModule,
     ReactiveFormsModule,
