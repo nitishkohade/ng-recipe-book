@@ -3,6 +3,8 @@ import { NgModule } from "@angular/core";
 import { FormsModule } from "@angular/forms";
 import { RouterModule } from "@angular/router";
 import { SharedModule } from "../common/shared.module";
+import { AuthGuardService } from "../services/auth-guard.service";
+import { AuthenticateGuardService } from "../services/authenticate-guard.service";
 import { AuthComponent } from "./auth.component";
 
 @NgModule({
@@ -11,7 +13,7 @@ import { AuthComponent } from "./auth.component";
         FormsModule, 
         SharedModule,
         RouterModule.forChild([
-            {path: 'auth', component: AuthComponent}
+            {path: 'auth', component: AuthComponent, canActivate: [AuthenticateGuardService]}
         ])]
 })
 export class AuthModule {
