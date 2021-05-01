@@ -1,6 +1,7 @@
-import { ApplicationRef, ChangeDetectionStrategy, Component, NgZone, OnInit, ViewEncapsulation } from '@angular/core';
+import { ApplicationRef, ChangeDetectionStrategy, Component, Inject, NgZone, OnInit, PLATFORM_ID, ViewEncapsulation } from '@angular/core';
 import { FirebaseAuthService } from './services/firebaseAuth.service';
 import { LoggingService } from './logging.service';
+import { isPlatformBrowser } from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -13,14 +14,17 @@ export class AppComponent implements OnInit {
   loadedFeature: string;
 
   ngOnInit() {
-    this.authService.autoLogin()
+    if(isPlatformBrowser(this.platformId)) {
+      this.authService.autoLogin()
+    } 
     this.loggingService.printLog("hello from app component ngOninit")
   }
   
   constructor(private app: ApplicationRef, 
     private zone: NgZone, 
     private authService: FirebaseAuthService,
-    private loggingService: LoggingService) {
+    private loggingService: LoggingService,
+    @Inject(PLATFORM_ID) private platformId) {
     // console.log(app)
     this.loadedFeature = "recipe"
     // console.log(zone)

@@ -34,7 +34,7 @@ import { shoppingListReducer } from './shopping-list/store/shopping-list.reducer
     StoreModule.forRoot({
       shoppingList: shoppingListReducer
     }),
-    BrowserModule,
+    BrowserModule.withServerTransition({ appId: 'serverApp' }),
     BrowserAnimationsModule,
     ReactiveFormsModule,
     HttpClientModule,
